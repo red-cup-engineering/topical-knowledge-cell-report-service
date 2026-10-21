@@ -3,7 +3,7 @@
   "version": "0.1.2",
   "description": "Sells idempotent source-grounded topical reports through A2A or direct ActivityPub/x402 while hiring NotebookLM separately.",
   "type": "module",
-  "license": "Apache-2.0",
+  "license": "MIT",
   "files": [
     "scripts",
     "content",
@@ -40,5 +40,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/red-cup-engineering/topical-knowledge-cell-report-service.git"
+  },
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/561-group/.github/blob/main/TIPS.md"
   }
 }
