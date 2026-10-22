@@ -1,1 +1,1 @@
-{"keys":[{"crv":"Ed25519","x":"fElQAELSlM16OnBzPKricw-QVUaE-5VUY-Ix298oHc8","kty":"OKP","kid":"topical-knowledge-cell-report-service-ed25519","alg":"EdDSA","use":"sig"}]}
+{"keys":[{"crv":"Ed25519","x":"EY_dFaRzxNCCyF4049pTW44EIkcYLNTZk7z_MvZLtc0","kty":"OKP","kid":"topical-knowledge-cell-report-service-ed25519-2026-10-21","alg":"EdDSA","use":"sig"}]}
