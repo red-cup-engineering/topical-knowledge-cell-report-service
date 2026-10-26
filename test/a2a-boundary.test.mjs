@@ -2,9 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { Message, Role } from "@a2a-js/sdk";
 import { extractRmnPart, rmnPart } from "@red-cup-engineering/a2a-rmn-part-service";
-import { decodeSemantic, semanticBytes } from "@red-cup-engineering/relation-model-notation-cbor-codec";
 import { executeA2aMessage } from "../scripts/execute-a2a-task.mjs";
-import { decodeResponse, encodeRequest } from "../src/protocol.mjs";
+import { reportServiceProtocol, encodeRequest } from "../src/protocol.mjs";
 
 function message(operation, input = {}) {
   const request = encodeRequest(operation, input);
@@ -13,7 +12,7 @@ function message(operation, input = {}) {
     contextId: "",
     taskId: "",
     role: Role.ROLE_USER,
-    parts: [rmnPart(semanticBytes(request.term), "topical-report-service-request.rmn.cbor")],
+    parts: [rmnPart(request.bytes, "topical-report-service-request.rmn.cbor")],
     metadata: {},
     extensions: [],
     referenceTaskIds: [],
@@ -22,7 +21,8 @@ function message(operation, input = {}) {
 
 function response(output) {
   const parsed = Message.fromJSON(output);
-  return decodeResponse(decodeSemantic(extractRmnPart(parsed.parts).bytes));
+  const part = extractRmnPart(parsed.parts);
+  return reportServiceProtocol.admitResponse(part.bytes, part.ni);
 }
 
 test("the callable face refuses while its deployment boundary is not activated", async () => {

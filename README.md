@@ -90,7 +90,19 @@ V2 quote execution checks the original seller-issued quote witness as well as it
 
 ## Installation status and verification
 
-The repository's deployment boundary remains unactivated: no live report producer, reviewer, authenticated customer binding or settlement/delivery composition has been supplied there. The house package registry is `https://registry.561.group`. Its inspected packument and exact-version routes returned HTTP 503 for the declared `a2a-contracted-agent-service@2.0.5`, current-source `2.0.9`, and the declared sovereign-operation-boundary dependency during qualification, so their installed closure has not yet been received. Current contracted-agent source was inspected for task custody, immediate return, recovery, authentication and executor environment behavior. Restore package resolution and supply the actual owning host composition before starting the server.
+Install the exact dependencies from the house registry, `https://registry.561.group`. The report service selects these published A2A interfaces:
+
+| Package | Version | Role |
+| --- | --- | --- |
+| `a2a-contracted-agent-service` | `0.12.0` | Authenticated server, original task custody, background execution and recovery |
+| `a2a-sovereign-operation-boundary-service` | `0.4.0` | Commission operation protocol, runtime loading and executor dispatch |
+| `a2a-rmn-part-service` | `0.5.0` | Content-identified A2A message parts |
+| `ni-services-section` | `0.1.2` | Existing NI byte identity used by the report checks |
+| `@a2a-js/sdk` | `1.1.0` | Stable message interfaces shared with the contracted server and RMN parts |
+
+The published server accepts the existing task and coordination sources, customer Bearer binding and executor arguments, and passes the original task identity through `A2A_TASK_ID`. The operation protocol returns the admitted request envelope as `encodeRequest(...).bytes`; responses are read with `reportServiceProtocol.admitResponse(bytes, ni)`. The A2A checks use those original protocol interfaces. Data `0.7.1`, File `0.8.4`, and the declared semantic-content identity supplier also have exact house-registry publications.
+
+The received house artifacts pass the three A2A boundary checks, seven existing report checks and fourteen commission checks. Host activation supplies the actual authenticated customer, producer, reviewer, existing task and coordination custody, and settlement/delivery bindings through the deployment boundary and runtime composition described above.
 
 `npm run check` checks the module syntax. `test/commission.test.mjs` exercises the native selected Data and File services, durable coordination-port records, concurrent admission, interruption/reconciliation, seller-issued quote checks, supporting artifact/review acceptance and malformed-result replay. Run it with `node --test --test-isolation=none --test-reporter=tap test/commission.test.mjs` where process-isolated test reporting is unavailable.
 
