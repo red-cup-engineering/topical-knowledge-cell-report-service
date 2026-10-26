@@ -34,7 +34,7 @@ test("the callable face refuses while its deployment boundary is not activated",
   assert.match(result.reason, /not activated/u);
 });
 
-test("the callable face dispatches only its two owned operations", async () => {
+test("the callable face dispatches only its owned operations", async () => {
   const output = await executeA2aMessage(message("publish-corpus"), async () => ({
     quoteProviders: {},
     quoteOptions: {},
@@ -57,3 +57,4 @@ test("an admitted operation reaches the owned kernel and preserves its refusal",
   assert.equal(result.disposition, "refused");
   assert.match(result.reason, /missing requestId|unexpected|wrong report request type/u);
 });
+

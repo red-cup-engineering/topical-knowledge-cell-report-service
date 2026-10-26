@@ -1,37 +1,160 @@
 {
   "name": "Topical Knowledge Cell Report Service",
-  "description": "Sells one bounded source-grounded report over a customer-selected topical knowledge cell; deployment and retail payment remain fail-closed until exact providers and a payout account are bound.",
+  "description": "Commission reviewed reports with a prompt and structured discipline, document, audience and artifact choices; follow durable A2A tasks and retrieve completed work.",
   "supportedInterfaces": [
-    { "url": "${BASE_URL}/a2a/jsonrpc", "protocolBinding": "JSONRPC", "tenant": "", "protocolVersion": "1.0" },
-    { "url": "${BASE_URL}/a2a/rest", "protocolBinding": "HTTP+JSON", "tenant": "", "protocolVersion": "1.0" }
+    {
+      "url": "${BASE_URL}/a2a/jsonrpc",
+      "protocolBinding": "JSONRPC",
+      "tenant": "",
+      "protocolVersion": "1.0"
+    },
+    {
+      "url": "${BASE_URL}/a2a/rest",
+      "protocolBinding": "HTTP+JSON",
+      "tenant": "",
+      "protocolVersion": "1.0"
+    }
   ],
-  "provider": { "url": "https://emsenn.net/", "organization": "Topical Knowledge Cell Report Service" },
-  "version": "0.1.0",
-  "capabilities": { "streaming": false, "pushNotifications": false, "extensions": [], "extendedAgentCard": false },
-  "securitySchemes": {},
-  "securityRequirements": [],
-  "defaultInputModes": ["application/rmn+cbor"],
-  "defaultOutputModes": ["application/rmn+cbor"],
+  "provider": {
+    "url": "https://emsenn.net/",
+    "organization": "Topical Knowledge Cell Report Service"
+  },
+  "version": "0.2.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "extensions": [],
+    "extendedAgentCard": false
+  },
+  "securitySchemes": {
+    "reportCustomer": {
+      "httpAuthSecurityScheme": {
+        "scheme": "Bearer",
+        "description": "Customer token supplied by the owning report host."
+      }
+    }
+  },
+  "securityRequirements": [
+    {
+      "schemes": {
+        "reportCustomer": {
+          "list": []
+        }
+      }
+    }
+  ],
+  "defaultInputModes": [
+    "application/rmn+cbor"
+  ],
+  "defaultOutputModes": [
+    "application/rmn+cbor"
+  ],
   "skills": [
+    {
+      "id": "describe-report-commission",
+      "name": "Choose a report",
+      "description": "Read the current shared form and agent commission contract, producer choices and delivery methods.",
+      "tags": [
+        "report",
+        "research",
+        "form"
+      ],
+      "examples": [],
+      "inputModes": [
+        "application/rmn+cbor"
+      ],
+      "outputModes": [
+        "application/rmn+cbor"
+      ],
+      "securityRequirements": [
+        {
+          "schemes": {
+            "reportCustomer": {
+              "list": []
+            }
+          }
+        }
+      ]
+    },
     {
       "id": "issue-report-quote",
       "name": "Issue exact report quote",
       "description": "Issues one replayable seller-authored x402 quote only when a production payout account and settlement facilitator are admitted.",
-      "tags": ["report", "quote", "x402", "usdc"],
+      "tags": [
+        "report",
+        "quote",
+        "x402",
+        "usdc"
+      ],
       "examples": [],
-      "inputModes": ["application/rmn+cbor"],
-      "outputModes": ["application/rmn+cbor"],
-      "securityRequirements": []
+      "inputModes": [
+        "application/rmn+cbor"
+      ],
+      "outputModes": [
+        "application/rmn+cbor"
+      ],
+      "securityRequirements": [
+        {
+          "schemes": {
+            "reportCustomer": {
+              "list": []
+            }
+          }
+        }
+      ]
     },
     {
       "id": "execute-report",
       "name": "Execute source-grounded report contract",
       "description": "Validates exact authority, settlement when external, provider grounding and cost receipts, then returns or privately delivers one report.",
-      "tags": ["report", "notebooklm", "activitypub", "receipt"],
+      "tags": [
+        "report",
+        "notebooklm",
+        "activitypub",
+        "receipt"
+      ],
       "examples": [],
-      "inputModes": ["application/rmn+cbor"],
-      "outputModes": ["application/rmn+cbor"],
-      "securityRequirements": []
+      "inputModes": [
+        "application/rmn+cbor"
+      ],
+      "outputModes": [
+        "application/rmn+cbor"
+      ],
+      "securityRequirements": [
+        {
+          "schemes": {
+            "reportCustomer": {
+              "list": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "get-report",
+      "name": "Retrieve a report",
+      "description": "Read the durable progress, original A2A task and retained deliverables of an authenticated customer commission.",
+      "tags": [
+        "report",
+        "status",
+        "results"
+      ],
+      "examples": [],
+      "inputModes": [
+        "application/rmn+cbor"
+      ],
+      "outputModes": [
+        "application/rmn+cbor"
+      ],
+      "securityRequirements": [
+        {
+          "schemes": {
+            "reportCustomer": {
+              "list": []
+            }
+          }
+        }
+      ]
     }
   ],
   "signatures": []
