@@ -5,11 +5,15 @@ import { executeRelationalOperationMessage } from "@red-cup-engineering/a2a-sove
 import {
   executeTopicalKnowledgeCellReport,
   issueTopicalKnowledgeCellReportQuote,
+  readTopicalKnowledgeCellReport,
 } from "../lib/report.mjs";
 import { reportServiceProtocol } from "../src/protocol.mjs";
 import { loadReportRuntime } from "../src/runtime.mjs";
+import { describeReportCommission } from "../lib/commission.mjs";
 
 const operations = Object.freeze({
+  "describe-report-commission": (_input, runtime) => describeReportCommission(runtime.reportOptions.commissionProfile),
+  "get-report": (input, runtime) => readTopicalKnowledgeCellReport(input, runtime.reportProviders, runtime.reportOptions),
   "issue-report-quote": (input, runtime) => issueTopicalKnowledgeCellReportQuote(
     input,
     runtime.quoteProviders,
@@ -40,3 +44,4 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     process.exitCode = 1;
   }
 }
+
