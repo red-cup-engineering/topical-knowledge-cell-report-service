@@ -9,6 +9,11 @@ import { normalizeReportCommission, planReportCommission, describeReportCommissi
 import { FORBIDDEN_AUTHORITIES, executeTopicalKnowledgeCellReport, issueTopicalKnowledgeCellReportQuote, readTopicalKnowledgeCellReport } from "../lib/report.mjs";
 import { identifyReportCommissionContent as identify } from "../src/commission-identity.mjs";
 import { createLocalReportExecutionLease, createReportWitnessProviders } from "../src/report-witness.mjs";
+import { Message } from "@a2a-js/sdk";
+import { userRmnMessage, extractRmnPart } from "@red-cup-engineering/a2a-rmn-part-service";
+import { createRelationalOperationProtocol } from "@red-cup-engineering/a2a-sovereign-operation-boundary-service";
+import { reportServiceProtocol } from "../src/protocol.mjs";
+import { executeA2aMessage } from "../scripts/execute-a2a-task.mjs";
 
 const NOW = "2026-10-25T20:00:00.000Z", CUSTOMER = "urn:ame:report-customer", PRODUCER = "urn:ame:notebook-producer";
 const ASSET = { assetId: "eip155:8453/erc20:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913", network: "eip155:8453", tokenContract: "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913", symbol: "USDC", decimals: 6 };
@@ -246,5 +251,78 @@ test("literal __proto__ deliverables are reviewed as own data and altered bytes 
       assert.equal(Object.hasOwn(result.report.review.deliverableDigests, "__proto__"), true);
       assert.equal(result.report.artifacts[0].id, "__proto__");
     }
+  }
+});
+
+test("canonical transport preserves the complete v2 plan across nested member order", async () => {
+  const reverseMembers = value => Array.isArray(value) ? value.map(reverseMembers)
+    : value && typeof value === "object" ? Object.fromEntries(Object.entries(value).reverse().map(([key, child]) => [key, reverseMembers(child)])) : value;
+  const one = await planReportCommission(terms(), PROFILE, identify);
+  const reordered = reverseMembers(terms()), two = await planReportCommission(reordered, PROFILE, identify);
+  assert.equal(one.commissionId, two.commissionId); assert.equal(one.plan.id, two.plan.id);
+  assert.deepEqual(one.plan.providerRequests, two.plan.providerRequests);
+  const input = await request(reordered), wire = reportServiceProtocol.encodeRequest("execute-report", input);
+  const admitted = reportServiceProtocol.admitRequest(wire.bytes, wire.id).input;
+  assert.deepEqual(admitted, input);
+  assert.equal((await planReportCommission(admitted.terms, PROFILE, identify)).plan.id, one.plan.id);
+  const descriptor = describeReportCommission(PROFILE);
+  assert.deepEqual(descriptor.asynchronous, { protocol: "A2A", version: "1.0", submit: "SendMessage",
+    submitConfiguration: { returnImmediately: true }, status: "GetTask", history: "ListTasks", cancel: "CancelTask" });
+});
+
+test("v2 canonical A2A intake and output retain original Unicode prompt and reviewed report bytes", async t => {
+  const h = await harness(t), source = terms(); source.prompt = "Study cafe\u0301 culture."; source.audience.description = "Cafe\u0301 researchers";
+  const input = await request(source), original = h.providers.generateReportCommission;
+  h.providers.generateReportCommission = async value => {
+    assert.equal(value.commission.prompt, source.prompt);
+    assert.equal(value.commission.audience.description, source.audience.description);
+    assert.ok(value.plan.providerRequests.every(item => item.instructions.includes(source.prompt)));
+    const output = await original(value); output.report.text = "# Cafe\u0301 study\n\nSource-grounded fixture.";
+    output.report.contentDigest = digest(output.report.text); return output;
+  };
+  const wire = reportServiceProtocol.encodeRequest("execute-report", input);
+  const message = await executeA2aMessage(userRmnMessage(wire.bytes), async () => ({
+    reportProviders: h.providers, reportOptions: options(), quoteProviders: h.providers, quoteOptions: options(),
+  }));
+  const part = extractRmnPart(Message.fromJSON(message).parts), received = reportServiceProtocol.admitResponse(part.bytes, part.ni);
+  assert.equal(received.disposition, "accepted", received.reason);
+  assert.equal(received.result.report.commission.prompt, source.prompt);
+  assert.equal(received.result.report.text, "# Cafe\u0301 study\n\nSource-grounded fixture.");
+  assert.equal(received.result.report.contentDigest, digest(received.result.report.text));
+  assert.equal(received.result.report.review.deliverableDigests.report, received.result.report.contentDigest);
+  assert.deepEqual(h.calls, { generate: 1, review: 1, settle: 0, deliver: 0 });
+});
+
+const originalSemanticProtocol = () => createRelationalOperationProtocol({
+  requestKind: "org.emsenn.topical-knowledge-cell-report-service.request.v1",
+  responseKind: "org.emsenn.topical-knowledge-cell-report-service.response.v1", label: "report-service protocol",
+});
+
+test("v1 operation and response carriers retain their original semantic wire identities", () => {
+  const original = originalSemanticProtocol(), input = { type: "TopicalKnowledgeCellReportRequest",
+    terms: { prompt: "Legacy cafe\u0301 prompt", format: "brief", language: "en", length: "short" } };
+  const before = original.encodeRequest("execute-report", input), after = reportServiceProtocol.encodeRequest("execute-report", input);
+  assert.equal(after.id, before.id); assert.deepEqual(after.bytes, before.bytes);
+  const response = { request: before.id, disposition: "accepted",
+    result: { type: "TopicalKnowledgeCellReportServiceResult", report: { version: 1, text: "Legacy result" } } };
+  const oldOutput = original.encodeResponse(response), output = reportServiceProtocol.encodeResponse(response);
+  assert.equal(output.id, oldOutput.id); assert.deepEqual(output.bytes, oldOutput.bytes);
+  assert.deepEqual(reportServiceProtocol.admitResponse(output.bytes, output.id), original.admitResponse(oldOutput.bytes, oldOutput.id));
+});
+
+test("v2 protocol rejects plain normalized intake and malformed or ambiguous exact carriers", () => {
+  const original = originalSemanticProtocol(), plain = original.encodeRequest("execute-report", { terms: terms() });
+  assert.throws(() => reportServiceProtocol.admitRequest(plain.bytes, plain.id), /exact JSON byte carrier/);
+  const carrier = (text, mediaType = "application/json") => ({ type: "ReportCommissionJsonByteCarrier", version: 2,
+    body: { mediaType, contentBase64: Buffer.from(text).toString("base64") } });
+  for (const input of [
+    carrier('{ "terms": {"version":2} }'),
+    carrier('{"terms":{"version":2}}', "text/plain"),
+    carrier('{"terms":{"version":1}}'),
+    { type: "ReportCommissionJsonByteCarrier", version: 2, body: { mediaType: "application/json", contentBase64: "***" } },
+    { ...carrier('{"terms":{"version":2}}'), extra: true },
+  ]) {
+    const wire = original.encodeRequest("execute-report", input);
+    assert.throws(() => reportServiceProtocol.admitRequest(wire.bytes, wire.id));
   }
 });
