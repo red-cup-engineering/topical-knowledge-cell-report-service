@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=/home/emsenn/info/lib/emsenn/services/561-group/services/red-cup-engineering/services/software-services-section/services/topical-knowledge-cell-report-service
-ExecStart=/home/emsenn/.config/nvm/versions/node/v24.13.1/bin/node bin/server.mjs
+ExecStart=/home/emsenn/.config/nvm/versions/node/v24.13.1/bin/node scripts/server.mjs
 Environment=HOST=127.0.0.1
 Environment=PORT=19837
 Environment=BASE_URL=http://127.0.0.1:19837
