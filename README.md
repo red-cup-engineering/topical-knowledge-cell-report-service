@@ -8,3 +8,5 @@
 <!-- 561-group-standards:badges:end -->
 
 Sells idempotent source-grounded topical reports through A2A or direct ActivityPub/x402 while hiring NotebookLM separately.
+
+The [proposed report commission contract](content/specifications/report-commission-contract.md) allocates richer prompt/form commissioning to this existing service, preserves legacy callers, and records the actual provider, native fabrication and durable lifecycle prerequisites. It is a requirements/design proposal; current deployment remains unactivated.
