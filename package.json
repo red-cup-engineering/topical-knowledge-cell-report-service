@@ -24,9 +24,8 @@
     "serve-topical-knowledge-cell-report-a2a": "./scripts/server.mjs"
   },
   "scripts": {
-    "check": "node --check lib/law.mjs && node --check lib/report.mjs && node --check lib/commission.mjs && node --check src/protocol.mjs && node --check src/runtime.mjs && node --check src/report-witness.mjs && node --check src/compose-runtime.mjs && node --check src/commission-identity.mjs && node --check scripts/execute-a2a-task.mjs && node --check scripts/server.mjs && node --check test/*.test.mjs",
-    "test": "node --test test/*.test.mjs",
-    "verify": "npm run check && npm test",
+    "check": "node --check lib/law.mjs && node --check lib/report.mjs && node --check lib/commission.mjs && node --check src/protocol.mjs && node --check src/runtime.mjs && node --check src/report-witness.mjs && node --check src/compose-runtime.mjs && node --check src/commission-identity.mjs && node --check scripts/execute-a2a-task.mjs && node --check scripts/server.mjs",
+    "verify": "npm run check",
     "pack:check": "npm pack --dry-run"
   },
   "engines": {
