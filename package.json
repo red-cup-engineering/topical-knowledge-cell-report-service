@@ -1,0 +1,52 @@
+{
+  "name": "@red-cup-engineering/topical-knowledge-cell-report-service",
+  "version": "0.2.0",
+  "description": "Sells idempotent source-grounded topical reports through A2A or direct ActivityPub/x402 while hiring NotebookLM separately.",
+  "type": "module",
+  "license": "MIT",
+  "files": [
+    "scripts",
+    "content",
+    "lib",
+    "src"
+  ],
+  "exports": {
+    ".": "./lib/report.mjs",
+    "./law": "./lib/law.mjs",
+    "./protocol": "./src/protocol.mjs",
+    "./commission": "./lib/commission.mjs",
+    "./runtime": "./src/compose-runtime.mjs",
+    "./witness": "./src/report-witness.mjs",
+    "./commission-identity": "./src/commission-identity.mjs"
+  },
+  "bin": {
+    "serve-topical-knowledge-cell-report-a2a": "./scripts/server.mjs"
+  },
+  "scripts": {
+    "check": "node --check lib/law.mjs && node --check lib/report.mjs && node --check lib/commission.mjs && node --check src/protocol.mjs && node --check src/runtime.mjs && node --check src/report-witness.mjs && node --check src/compose-runtime.mjs && node --check src/commission-identity.mjs && node --check scripts/server.mjs",
+    "verify": "npm run check",
+    "pack:check": "npm pack --dry-run"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@a2a-js/sdk": "1.1.0",
+    "@red-cup-engineering/a2a-contracted-agent-service": "0.12.0",
+    "@red-cup-engineering/a2a-rmn-part-service": "0.5.0",
+    "@red-cup-engineering/a2a-sovereign-operation-boundary-service": "0.4.0",
+    "@red-cup-engineering/ni-services-section": "0.1.2",
+    "@red-cup-engineering/json-services-section": "0.4.0",
+    "@red-cup-engineering/computer-data-engineering-services-section": "0.7.1",
+    "@red-cup-engineering/computer-file-engineering-services-section": "0.8.4",
+    "@red-cup-engineering/signcell": "^0.18.0 || 0.18.1-dev.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/red-cup-engineering/topical-knowledge-cell-report-service.git"
+  },
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/561-group/.github/blob/main/TIPS.md"
+  }
+}
