@@ -1,5 +1,7 @@
 import { createRelationalOperationProtocol } from "@red-cup-engineering/a2a-sovereign-operation-boundary-service";
-import { canonicalJson, encodeJsonByteCarrier, decodeJsonByteCarrier } from "@red-cup-engineering/json-services-section";
+import { canonicalJson } from "@red-cup-engineering/json-engine/canonical-json";
+import { encodeJsonByteCarrier } from "@red-cup-engineering/json-engine/encode-json-byte-carrier";
+import { decodeJsonByteCarrier } from "@red-cup-engineering/json-engine/decode-json-byte-carrier";
 
 const semanticProtocol = createRelationalOperationProtocol({
   requestKind: "org.emsenn.topical-knowledge-cell-report-service.request.v1",
