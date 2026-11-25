@@ -1,9 +1,9 @@
-import { createHash } from "node:crypto";
+import { sha256Hex } from "@red-cup-engineering/semiotic-content-address-system";
 import { isAbsolute, join } from "node:path";
 import { acquireLocalFileLeaseSync } from "@red-cup-engineering/computer-file-engineering-services-section/local-file-lease";
 
 const NAMESPACE = "topical-knowledge-cell-report-service";
-const coordinateKey = (kind, requestId) => createHash("sha256").update(JSON.stringify([kind, requestId])).digest("hex");
+const coordinateKey = (kind, requestId) => sha256Hex(JSON.stringify([kind, requestId]));
 
 /** Use the same host-owned A2A coordination ownership for report witnesses.
  * No filesystem report store, queue or duplicate A2A task is created. */
@@ -46,7 +46,7 @@ export function createReportWitnessProviders({ coordinationSource, tenant, withR
 export function createLocalReportExecutionLease({ directory, host }) {
   if (typeof directory !== "string" || !isAbsolute(directory) || typeof host?.executeCommandSync !== "function") throw new TypeError("local report execution requires its absolute host lease directory and Code executor");
   return async (coordinate, operation) => {
-    const name = createHash("sha256").update(JSON.stringify(coordinate)).digest("hex");
+    const name = sha256Hex(JSON.stringify(coordinate));
     const lease = acquireLocalFileLeaseSync({ type: "LocalFileLeaseRequest", version: 1,
       profile: "linux-local-flock-v1", path: join(directory, `${name}.lock`) }, host);
     try { lease.assertBound(); return await operation(); }
